@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - Django Блог{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user"></i> Профиль пользователя: {{ user.username }}
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Информация:</h5>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d M Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file-alt"></i> Мои посты ({{ posts.count }})
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                {% if posts %}
+                    {% for post in posts %}
+                    <div class="post-item mb-3 pb-3 border-bottom">
+                        <h6>
+                            <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
+                        </h6>
+                        <small class="text-muted">
+                            {{ post.created_at|date:"d M Y H:i" }} | 
+                            {{ post.comments.count }} комментариев
+                        </small>
+                        <div class="mt-2">
+                            <a href="{% url 'post-update' post.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Редактировать
+                            </a>
+                            <a href="{% url 'post-delete' post.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i> Удалить
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">У вас пока нет постов.</p>
+                    <a href="{% url 'post-create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Создать первый пост
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

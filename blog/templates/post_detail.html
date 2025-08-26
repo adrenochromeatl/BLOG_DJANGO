@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Django Блог{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Пост -->
+        <article class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">{{ post.title }}</h1>
+                
+                <div class="text-muted mb-4">
+                    <small>
+                        <i class="fas fa-user"></i> {{ post.author.username }}
+                        <i class="fas fa-calendar ms-3"></i> {{ post.created_at|date:"d M Y H:i" }}
+                        {% if post.updated_at != post.created_at %}
+                        <i class="fas fa-edit ms-3"></i> Обновлено: {{ post.updated_at|date:"d M Y H:i" }}
+                        {% endif %}
+                    </small>
+                </div>
+                
+                <div class="post-content">
+                    {{ post.content|linebreaks }}
+                </div>
+                
+                {% if user == post.author %}
+                <div class="mt-4">
+                    <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <a href="{% url 'post-delete' post.pk %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash"></i> Удалить
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </article>
+
+        <!-- Комментарии -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-comments"></i> Комментарии ({{ post.comments.count }})
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                {% if post.comments.all %}
+                    {% for comment in post.comments.all %}
+                    <div class="comment mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <strong>{{ comment.author.username }}</strong>
+                            <small class="text-muted">{{ comment.created_at|date:"d M Y H:i" }}</small>
+                        </div>
+                        <p class="mb-1 mt-2">{{ comment.content }}</p>
+                        
+                        {% if user == comment.author or user == post.author %}
+                        <form method="post" action="{% url 'delete-comment' comment.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+                {% endif %}
+                
+                <!-- Форма комментария -->
+                {% if user.is_authenticated %}
+                <div class="mt-4">
+                    <h6>Добавить комментарий:</h6>
+                    <form method="post" action="{% url 'add-comment' post.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ comment_form.content }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Отправить
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i> 
+                    <a href="{% url 'login' %}" class="alert-link">Войдите</a>, 
+                    чтобы оставить комментарий.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

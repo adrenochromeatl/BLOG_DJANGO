@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Редактировать пост{% else %}Новый пост{% endif %} - Django Блог
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-edit"></i>
+                    {% if form.instance.pk %}Редактировать пост{% else %}Создать новый пост{% endif %}
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Заголовок</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.title.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">Содержание</label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.content.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% if form.instance.pk %}{% url 'post-detail' form.instance.pk %}{% else %}{% url 'post-list' %}{% endif %}" 
+                           class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 
+                            {% if form.instance.pk %}Обновить{% else %}Создать{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
